@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>A MAP // ADMIN CONTROL</title><link rel="stylesheet" href="style.css">
+<style>
+body{min-height:100vh}.admin-shell{max-width:1000px;margin:0 auto;padding:28px 16px 60px}.admin-card,.readme-card{border:1px solid rgba(255,40,40,.45);background:rgba(8,0,0,.72);box-shadow:0 0 35px rgba(160,0,0,.14);padding:24px;margin:18px 0}.admin-title{font-size:clamp(30px,7vw,64px);letter-spacing:8px;text-align:center;color:#fff;text-shadow:0 0 18px #f00;margin:10px 0}.admin-sub{text-align:center;letter-spacing:4px;color:#c66;margin-bottom:25px}.readme-card h2{color:#fff;letter-spacing:3px;border-bottom:1px solid #511;padding-bottom:12px}.readme-card h3{color:#e55;letter-spacing:2px;margin-top:24px}.readme-card p{color:#aaa;line-height:1.75}.readme-card code{color:#fff;background:#160000;padding:2px 6px}.field{margin:15px 0}.field label{display:block;color:#b88;letter-spacing:2px;font-size:12px;margin-bottom:8px}.field input,.field textarea{width:100%;box-sizing:border-box;background:#070707;color:#fff;border:1px solid #522;padding:14px;font-size:15px;outline:none}.field textarea{min-height:120px;resize:vertical}button,.back{display:inline-flex;justify-content:center;align-items:center;min-height:50px;padding:0 20px;border:1px solid #d11;background:#260000;color:#fff;letter-spacing:2px;text-decoration:none;cursor:pointer;margin:7px 5px 7px 0}.status{padding:12px;border:1px solid #333;color:#aaa;margin-top:12px;white-space:pre-wrap}.lock{max-width:500px;margin:70px auto}.hidden{display:none!important}.danger-note{border-left:3px solid #b00;padding-left:12px}
+</style>
+</head>
+<body class="dark-bg">
+<div class="admin-shell">
+<div class="admin-title">A MAP</div><div class="admin-sub">ADMIN CONTROL // RESTRICTED</div>
+<section id="loginBox" class="admin-card lock"><h2>ADMIN AUTHORIZATION</h2><div class="field"><label>ADMIN USERNAME</label><input id="adminUser" autocomplete="username" placeholder="Enter username"></div><div class="field"><label>ADMIN PASSWORD</label><input id="adminPass" type="password" autocomplete="current-password" placeholder="Enter password"></div><button id="adminLogin">ENTER ADMIN</button><div id="loginStatus" class="status"></div></section>
+<main id="panel" class="hidden">
+<section class="readme-card">
+<h2>README // ADMIN CONTROL MANUAL</h2>
+<h3>01 — PURPOSE</h3><p>A MAP-এর configuration এখান থেকেই পরিচালনা করা যাবে। User login information, Hack.chat link, Admin boxes এবং information password এক জায়গা থেকে পরিবর্তন করা যাবে।</p>
+<h3>02 — AUTO PASSWORD</h3><p>Login page প্রতিবার নতুন করে load হলে নতুন 8-character unique Auto Password তৈরি হয়। Login screen-এ প্রদর্শিত password-টিই সেই page-এর জন্য valid password। Refresh করলে আগের password আর valid থাকবে না।</p>
+<h3>03 — HACK.CHAT LINK</h3><p>নিচের <code>Hack.chat Group Link</code> field-এ room link লিখে <code>SAVE SETTINGS</code> চাপো। এরপর Dashboard-এর CONNECT TO ADMIN থেকে verification code পূরণ করলে saved link open হবে। প্রয়োজন হলে একইভাবে নতুন link save করা যাবে।</p>
+<h3>04 — ADMIN INFORMATION</h3><p>Dashboard-এর 5টি Admin Box-এর নাম ও বড় information text এখান থেকে edit করা যাবে। Dashboard-এ information দেখার জন্য Information-view password লাগবে।</p>
+<h3>05 — IMPORTANT</h3><p class="danger-note">এই version browser localStorage ব্যবহার করে। তাই settings একই browser/device-এ persist করবে; এটি real server-side lifetime security নয়। Multi-device বা সত্যিকারের secure control-এর জন্য Firebase/backend authentication প্রয়োজন।</p>
+</section>
+<section class="admin-card"><h2>LIVE SETTINGS</h2>
+<div class="field"><label>HACK.CHAT GROUP LINK</label><input id="groupLink" placeholder="https://hack.chat/?room"></div>
+<div class="field"><label>CONNECT BUTTON TEXT</label><input id="buttonText" placeholder="CONNECT TO ADMIN"></div>
+<div class="field"><label>USER NAME</label><input id="allowedName"></div>
+<div class="field"><label>USER NUMBER</label><input id="allowedNumber"></div>
+<div class="field"><label>SECURITY CODE</label><input id="securityCode"></div>
+<div class="field"><label>INFORMATION-VIEW PASSWORD</label><input id="infoPassword"></div>
+<h3>ADMIN 1–5</h3><div id="admins"></div>
+<button id="save">SAVE SETTINGS</button><a class="back" href="./dashboard.html">BACK TO DASHBOARD</a><div id="status" class="status"></div>
+</section>
+</main></div>
+<script>
+'use strict';
+const KEY='AMAP_CONFIG';
+const DEFAULT={groupLink:'',contactText:'CONNECT TO ADMIN',allowedName:'VOIDUSER',allowedNumber:'1234567890',securityCode:'7319',autoPassword:'',adminInfoPassword:'939479219',adminNames:['ADMIN 1','ADMIN 2','ADMIN 3','ADMIN 4','ADMIN 5'],adminInfos:['Admin 1 Information','Admin 2 Information','Admin 3 Information','Admin 4 Information','Admin 5 Information']};
+const $=id=>document.getElementById(id);function load(){try{return {...DEFAULT,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return {...DEFAULT}}}function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}function render(){const c=load();$('groupLink').value=c.groupLink||'';$('buttonText').value=c.contactText||'CONNECT TO ADMIN';$('allowedName').value=c.allowedName||'';$('allowedNumber').value=c.allowedNumber||'';$('securityCode').value=c.securityCode||'';$('infoPassword').value=c.adminInfoPassword||'939479219';$('admins').innerHTML='';for(let i=0;i<5;i++)$('admins').innerHTML+=`<div class="field"><label>ADMIN ${i+1} NAME</label><input id="an${i}" value="${esc(c.adminNames?.[i]||('ADMIN '+(i+1)))}"></div><div class="field"><label>ADMIN ${i+1} INFORMATION</label><textarea id="ai${i}">${esc(c.adminInfos?.[i]||'')}</textarea></div>`}
+$('adminLogin').onclick=()=>{if($('adminUser').value==='NoOne'&&$('adminPass').value==='99'){$('loginBox').classList.add('hidden');$('panel').classList.remove('hidden');render();}else $('loginStatus').textContent='ACCESS DENIED // CHECK ADMIN CREDENTIALS';};
+$('save').onclick=()=>{const c=load();c.groupLink=$('groupLink').value.trim();c.contactText=$('buttonText').value.trim()||'CONNECT TO ADMIN';c.allowedName=$('allowedName').value.trim();c.allowedNumber=$('allowedNumber').value.trim();c.securityCode=$('securityCode').value.trim();c.adminInfoPassword=$('infoPassword').value.trim()||'939479219';c.adminNames=[];c.adminInfos=[];for(let i=0;i<5;i++){c.adminNames.push($('an'+i).value.trim()||('ADMIN '+(i+1)));c.adminInfos.push($('ai'+i).value)}localStorage.setItem(KEY,JSON.stringify(c));$('status').textContent='SETTINGS SAVED // CONFIGURATION UPDATED';};
+</script>
+</body></html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>A MAP // Restricted</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+<video id="bgVideo" class="bg-video" autoplay muted loop playsinline preload="auto">
+  <source src="assets/background.mp4" type="video/mp4">
+</video>
+<div class="dark-overlay"></div><div class="noise"></div><div class="scanlines"></div>
+<div class="corner c1">SYSTEM // 01</div><div class="corner c2">RESTRICTED</div><div class="corner c3">A MAP</div><div class="corner c4">ONLINE</div>
+
+<main class="login-shell"><div class="login-card">
+<div class="eyebrow">SECURE ACCESS PORTAL</div>
+<h1>A MAP</h1><div class="blood-line"></div>
+<p class="warning">AUTHORIZED ACCESS ONLY</p>
+<div class="generated-box"><span>AUTO PASSWORD</span><strong id="generatedPassword">--------</strong><small>TYPE THE CODE ABOVE INTO PASSWORD</small></div>
+<input id="userName" type="text" placeholder="ENTER NAME" autocomplete="off">
+<input id="userNumber" type="tel" placeholder="ENTER NUMBER" inputmode="numeric" autocomplete="off">
+<input id="userPassword" type="text" placeholder="ENTER AUTO PASSWORD" autocomplete="off">
+<input id="securityCode" type="text" placeholder="ENTER SECURITY CODE" inputmode="numeric" maxlength="20" autocomplete="off">
+<button id="enterBtn" type="button">ENTER SYSTEM <span>↯</span></button>
+<div id="loginMsg" class="message"></div>
+<div class="bottom-status"><span>● SYSTEM ACTIVE</span><span>ENCRYPTED</span></div>
+</div></main>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const CONFIG_KEY = 'AMAP_CONFIG';
+const DEFAULT = {
+  groupLink:'', contactText:'CONNECT TO ADMIN',
+  allowedName:'VOIDUSER', allowedNumber:'1234567890', securityCode:'7319',
+  adminInfoPassword:'939479219', adminNames:['ADMIN 1','ADMIN 2','ADMIN 3','ADMIN 4','ADMIN 5'],
+  adminInfos:['Admin 1 Information','Admin 2 Information','Admin 3 Information','Admin 4 Information','Admin 5 Information']
+};
+
+function makePassword(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const values=new Uint32Array(8);
+  if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(values);
+  else for(let i=0;i<8;i++) values[i]=Math.floor(Math.random()*0xffffffff);
+  let s='';
+  for(let i=0;i<8;i++) s += chars[values[i] % chars.length];
+  return s;
+}
+
+let cfg={};
+try { cfg=JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}') || {}; } catch(e){ cfg={}; }
+cfg={...DEFAULT,...cfg};
+
+/* NEW password every time this page loads. */
+cfg.autoPassword=makePassword();
+localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+$('generatedPassword').textContent=cfg.autoPassword;
+
+function login(){
+  const video=$('bgVideo');
+  try{ video.muted=false; const p=video.play(); if(p&&p.catch)p.catch(()=>{}); }catch(e){}
+  const n=$('userName').value.trim();
+  const num=$('userNumber').value.trim();
+  const pw=$('userPassword').value.trim();
+  const sc=$('securityCode').value.trim();
+  const msg=$('loginMsg');
+
+  if(!n||!num||!pw||!sc){ msg.textContent='COMPLETE ALL ACCESS FIELDS'; return; }
+
+  if(n===String(cfg.allowedName).trim() &&
+     num===String(cfg.allowedNumber).trim() &&
+     pw===String(cfg.autoPassword).trim() &&
+     sc===String(cfg.securityCode).trim()){
+    msg.textContent='ACCESS GRANTED';
+    sessionStorage.setItem('AMAP_ACCESS','GRANTED');
+    setTimeout(()=>location.replace('./dashboard.html'),120);
+  }else{
+    msg.textContent='ACCESS DENIED // CHECK YOUR CODE';
+  }
+}
+
+$('enterBtn').addEventListener('click',login);
+['userName','userNumber','userPassword','securityCode'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')login();}));
+</script>
+</body></html>

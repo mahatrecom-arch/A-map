@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A MAP // ACCESS</title><link rel="stylesheet" href="style.css">
+<style>
+.admin-panel-link-wrap{display:flex;justify-content:center;margin:46px 18px 30px}
+.admin-panel-link{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 30px;border:1px solid #b30000;color:#fff;text-decoration:none;letter-spacing:4px;font-weight:800;background:rgba(100,0,0,.22);box-shadow:0 0 22px rgba(180,0,0,.18)}
+.info-content{white-space:pre-wrap;line-height:1.7;text-align:left;max-height:55vh;overflow:auto}
+</style>
+</head>
+<body class="dashboard-page">
+<div class="dark-overlay"></div><div class="noise"></div><div class="scanlines"></div>
+<header class="topbar"><div><div class="brand">A MAP</div><div class="tiny">SECURE NETWORK // ACCESS GRANTED</div></div><div class="online"><i></i> ONLINE</div></header>
+<main>
+<section id="adminGrid" class="admin-grid"></section>
+<button id="contactButton" class="contact-button" type="button"><span id="contactText">CONNECT TO ADMIN</span><b>↗</b></button>
+<div class="dashboard-footer">SESSION ACTIVE // CONNECTION ESTABLISHED</div>
+
+<div id="infoModal" class="modal hidden"><div class="modal-card"><button class="close" data-close="infoModal">×</button><div class="modal-kicker">RESTRICTED ADMIN FILE</div><h2 id="infoTitle">ADMIN</h2><div class="blood-line"></div><p class="modal-note">ENTER ADMIN ACCESS PASSWORD</p><input id="infoPasswordInput" type="password" placeholder="ACCESS PASSWORD"><button id="infoUnlock" class="modal-action">VIEW INFORMATION</button><p id="infoMsg" class="message"></p><div id="infoContent" class="info-content hidden"></div></div></div>
+
+<div id="groupModal" class="modal hidden"><div class="modal-card"><button class="close" data-close="groupModal">×</button><div class="modal-kicker">SECURE GROUP CONNECTION</div><h2>CONNECT TO ADMIN</h2><div class="blood-line"></div><p class="modal-note">AUTO-GENERATED CONNECTION CODE</p><div id="groupCode" class="generated-code">------</div><small class="code-help">TYPE THE CODE ABOVE</small><input id="groupCodeInput" inputmode="numeric" maxlength="6" placeholder="ENTER CODE"><button id="groupUnlock" class="modal-action">JOIN GROUP ↗</button><p id="groupMsg" class="message"></p></div></div>
+
+<div class="admin-panel-link-wrap"><a class="admin-panel-link" href="./admin.html">⚙ ADMIN PANEL</a></div>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const DEFAULT={groupLink:'',contactText:'CONNECT TO ADMIN',adminInfoPassword:'939479219',adminNames:['ADMIN 1','ADMIN 2','ADMIN 3','ADMIN 4','ADMIN 5'],adminInfos:['Admin 1 Information','Admin 2 Information','Admin 3 Information','Admin 4 Information','Admin 5 Information']};
+let cfg={}; try{cfg=JSON.parse(localStorage.getItem('AMAP_CONFIG')||'{}')||{}}catch(e){cfg={}} cfg={...DEFAULT,...cfg};
+const names=Array.isArray(cfg.adminNames)?cfg.adminNames:DEFAULT.adminNames;
+const infos=Array.isArray(cfg.adminInfos)?cfg.adminInfos:DEFAULT.adminInfos;
+let selected=-1, groupCode='';
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+for(let i=0;i<5;i++){
+ const n=names[i]||('ADMIN '+(i+1)); const b=document.createElement('button'); b.className='admin-box'; b.type='button';
+ b.innerHTML='<div class="box-number">0'+(i+1)+'</div><div class="box-title">ADMIN</div><div class="box-name">'+esc(n)+'</div><div class="box-dot">●</div>';
+ b.onclick=()=>{selected=i;$('infoTitle').textContent=n;$('infoPasswordInput').value='';$('infoContent').classList.add('hidden');$('infoMsg').textContent='';$('infoModal').classList.remove('hidden');};
+ $('adminGrid').appendChild(b);
+}
+$('contactText').textContent=cfg.contactText||'CONNECT TO ADMIN';
+$('contactButton').onclick=()=>{groupCode=String(Math.floor(100000+Math.random()*900000));$('groupCode').textContent=groupCode;$('groupCodeInput').value='';$('groupMsg').textContent=cfg.groupLink?'':'ADMIN HAS NOT SET A GROUP LINK';$('groupModal').classList.remove('hidden');};
+$('infoUnlock').onclick=()=>{if($('infoPasswordInput').value.trim()===String(cfg.adminInfoPassword||'939479219').trim()){$('infoContent').textContent=infos[selected]||'No information available.';$('infoContent').classList.remove('hidden');$('infoMsg').textContent='';}else $('infoMsg').textContent='ACCESS DENIED';};
+$('groupUnlock').onclick=()=>{if($('groupCodeInput').value.trim()===groupCode){if(cfg.groupLink){location.href=cfg.groupLink;}else $('groupMsg').textContent='NO GROUP LINK CONFIGURED';}else $('groupMsg').textContent='INVALID CONNECTION CODE';};
+document.querySelectorAll('.close').forEach(x=>x.onclick=()=>$(x.dataset.close).classList.add('hidden'));
+</script>
+</body></html>
